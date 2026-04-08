@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Lista de Incidentes</title>
+<head>
+<body>
+    <h1>Lista de Incidentes</h1>
+
+    {% if incidentes %}
+      <table border="1" style="border-collapse: collapse; padding: 8px;">
+        <theard>
+          <tr>
+           <th>Tipo</th>
+           <th>Fecha</th>
+           <th>Descripción</th>
+           <th>Ubicación</th>
+           <th>Estado</th>
+         </tr>
+        </theard>
+        <tbody>
+         {% for incidente in incidentes %}
+        <tr>
+          <td>{{ incidente.tipo }}</td>
+          <td>{{ incidente.fecha }}</td>
+          <td>{{ incidente.descripcion }}</td>
+          <td>{{ incidente.ubicacion }}</td>
+          <td>{{ incidente.estado }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>No hay incidentes registrados.</p>
+    {% endif %}
+
+    <br />
+    <a href="/">Volver al Inicio</a>
+
+  </body>
+</html>

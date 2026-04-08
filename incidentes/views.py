@@ -12,8 +12,12 @@ def registrar_incidente(request):
         form = IncidenteForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('inicio')
+            return redirect('lista_incidentes')
     else:
         form = IncidenteForm()
 
     return render(request, 'registrar_incidente.html', {'form': form})
+
+def lista_incidentes(request):
+    incidentes = Incidente.objects.all().order_by('-fecha')
+    return render(request, 'lista_incidentes.html', {'incidentes': incidentes})
