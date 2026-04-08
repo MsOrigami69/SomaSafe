@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Registrar Incidente</title>
+  </head>
+  <body>
+    <h1>Registrar Incidente</h1>
+    <form method="post">
+      {% csrf_token %} {{ form.as_p }}
+      <button type="submit">Guardar Incidente</button>
+    </form>
+
+    <br />
+    <a href="/">Volver al Inicio</a>
+  </body>
+</html>
