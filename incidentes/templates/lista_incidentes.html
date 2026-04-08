@@ -16,6 +16,7 @@
            <th>Descripción</th>
            <th>Ubicación</th>
            <th>Estado</th>
+           <th>Acciones</th>
          </tr>
         </theard>
         <tbody>
@@ -26,6 +27,10 @@
           <td>{{ incidente.descripcion }}</td>
           <td>{{ incidente.ubicacion }}</td>
           <td>{{ incidente.estado }}</td>
+          <td>
+            <a href="/editar/{{ incidente.id }}/">Editar</a>
+            <a href="/eliminar/{{ incidente.id }}/";">Eliminar</a>
+          </td>
         </tr>
         {% endfor %}
         </tbody>
