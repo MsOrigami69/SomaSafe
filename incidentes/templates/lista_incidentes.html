@@ -1,26 +1,90 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <title>Lista de Incidentes</title>
-<head>
-<body>
+    <title>Lista de incidentes</title>
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #2c3e50;
+      }
+
+      table {
+        width: 90%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      th {
+        background-color: #2c3e50;
+        color: white;
+        padding: 10px;
+      }
+
+      td {
+        padding: 10px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      a {
+        text-decoration: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 14px;
+      }
+
+      a[href*="editar"] {
+        background-color: #3498db;
+        color: white;
+      }
+
+      a[href*="eliminar"] {
+        background-color: #e74c3c;
+        color: white;
+      }
+
+      .volver {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #2c3e50;
+      }
+    </style>
+  </head>
+
+  <body>
     <h1>Lista de Incidentes</h1>
 
     {% if incidentes %}
-      <table border="1" style="border-collapse: collapse; padding: 8px;">
-        <theard>
-          <tr>
-           <th>Tipo</th>
-           <th>Fecha</th>
-           <th>Descripción</th>
-           <th>Ubicación</th>
-           <th>Estado</th>
-           <th>Acciones</th>
-         </tr>
-        </theard>
-        <tbody>
-         {% for incidente in incidentes %}
+    <table>
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for incidente in incidentes %}
         <tr>
           <td>{{ incidente.tipo }}</td>
           <td>{{ incidente.fecha }}</td>
@@ -29,18 +93,16 @@
           <td>{{ incidente.estado }}</td>
           <td>
             <a href="/editar/{{ incidente.id }}/">Editar</a>
-            <a href="/eliminar/{{ incidente.id }}/";">Eliminar</a>
+            <a href="/eliminar/{{ incidente.id }}/">Eliminar</a>
           </td>
         </tr>
         {% endfor %}
-        </tbody>
-      </table>
+      </tbody>
+    </table>
     {% else %}
-      <p>No hay incidentes registrados.</p>
+    <p style="text-align: center">No hay incidentes registrados.</p>
     {% endif %}
 
-    <br />
-    <a href="/">Volver al Inicio</a>
-
+    <a href="/" class="volver">Volver al Inicio</a>
   </body>
 </html>
