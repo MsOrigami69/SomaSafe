@@ -25,4 +25,5 @@ urlpatterns = [
     path('incidentes/', views.lista_incidentes, name='lista_incidentes'),
     path('editar/<int:id>/', views.editar_incidente, name='editar_incidente'),
     path('eliminar/<int:id>/', views.eliminar_incidente, name='eliminar_incidente'),
+    path('login/', views.login_view, name='login'),
 ]

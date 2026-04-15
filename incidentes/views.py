@@ -40,3 +40,20 @@ def eliminar_incidente(request, id):
     incidente = get_object_or_404(Incidente, id=id)
     incidente.delete()
     return redirect('lista_incidentes')   
+
+from django.contrib.auth import authenticate, login
+
+def login_view(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
+            login(request, user)
+            return redirect('lista_incidentes')
+        else:
+            return render(request, 'login.html', {'error': 'Usuario o contraseña incorrectos'})
+
+    return render(request, 'login.html')
