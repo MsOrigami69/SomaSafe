@@ -65,10 +65,6 @@ def login_view(request):
     return render(request, 'login.html')
 
 def dashboard(request):
-    
-    criticos = Incidente.objects.filter(
-    riesgo='critico'
-).count()
 
     total = Incidente.objects.count()
 
@@ -83,6 +79,10 @@ def dashboard(request):
     resueltos = Incidente.objects.filter(
         estado='resuelto'
     ).count()
+    
+    criticos = Incidente.objects.filter(
+        riesgo='critico'
+    ).count()
 
     incidentes_recientes = Incidente.objects.order_by('-fecha')[:5]
 
@@ -91,6 +91,7 @@ def dashboard(request):
         'pendientes': pendientes,
         'en_proceso': en_proceso,
         'resueltos': resueltos,
+        'criticos': criticos,
         'incidentes_recientes': incidentes_recientes,
     }
 
