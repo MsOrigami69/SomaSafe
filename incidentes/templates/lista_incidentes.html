@@ -3,6 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <title>Lista de incidentes</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
 
     <style>
       body {
@@ -14,15 +17,18 @@
 
       h1 {
         text-align: center;
-        color: #607c98;
+        color: #0f3d56;
+        margin-top: 30px;
       }
 
       table {
-        width: 90%;
+        width: 95%;
         margin: 20px auto;
         border-collapse: collapse;
         background: white;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
       }
 
       th {
@@ -64,21 +70,58 @@
         margin-top: 20px;
         color: #2c3e50;
       }
+      .estado-pendiente {
+        color: #dc3545;
+        font-weight: bold;
+      }
+
+      .estado-proceso {
+        color: #fd7e14;
+        font-weight: bold;
+      }
+
+      .estado-resuelto {
+        color: #198754;
+        font-weight: bold;
+      }
     </style>
   </head>
 
   <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark"
+      style="background: #0f3d56">
+      <div class="container">
+        <a class="navbar-brand" href="/dashboard/"> SomaSafe </a>
+
+        <div>
+          <a href="/dashboard/" class="btn btn-outline-light me-2">
+            Dashboard
+          </a>
+
+          <a href="/registrar/" class="btn btn-outline-light me-2">
+            Registrar
+          </a>
+
+          <a href="/incidentes/" class="btn btn-outline-light"> Incidentes </a>
+        </div>
+      </div>
+    </nav>
     <h1>Lista de Incidentes</h1>
+    <p style="text-align: center; color: #6c757d">
+      Monitoreo y seguimiento de incidentes de seguridad minera
+    </p>
 
     {% if incidentes %}
     <table>
       <thead>
         <tr>
+          <th>ID</th>
           <th>Tipo</th>
           <th>Fecha</th>
-          <th>Descripción</th>
           <th>Ubicación</th>
           <th>Estado</th>
+          <th>Riesgo</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -86,11 +129,35 @@
       <tbody>
         {% for incidente in incidentes %}
         <tr>
+          <td>{{ incidente.id }}</td>
           <td>{{ incidente.tipo }}</td>
           <td>{{ incidente.fecha }}</td>
-          <td>{{ incidente.descripcion }}</td>
           <td>{{ incidente.ubicacion }}</td>
-          <td>{{ incidente.estado }}</td>
+          <td>
+            {% if incidente.estado == 'pendiente' %}
+            <span style="color: red; font-weight: bold"> Pendiente </span>
+
+            {% elif incidente.estado == 'en_proceso' %}
+            <span style="color: orange; font-weight: bold"> En proceso </span>
+
+            {% else %}
+            <span style="color: green; font-weight: bold"> Resuelto </span>
+            {% endif %}
+          </td>
+          <td>
+            {% if incidente.riesgo == 'bajo' %}
+            <span style="color: green; font-weight: bold"> Bajo </span>
+
+            {% elif incidente.riesgo == 'medio' %}
+            <span style="color: goldenrod; font-weight: bold"> Medio </span>
+
+            {% elif incidente.riesgo == 'alto' %}
+            <span style="color: orange; font-weight: bold"> Alto </span>
+
+            {% else %}
+            <span style="color: red; font-weight: bold"> Crítico </span>
+            {% endif %}
+          </td>
           <td>
             <a href="/editar/{{ incidente.id }}/">Editar</a>
             <a href="/eliminar/{{ incidente.id }}/">Eliminar</a>

@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth import authenticate, login
 from .models import Incidente
 from .forms import IncidenteForm
 
@@ -10,9 +11,13 @@ def inicio(request):
 def registrar_incidente(request):
     if request.method == 'POST':
         form = IncidenteForm(request.POST)
+
         if form.is_valid():
             form.save()
             return redirect('lista_incidentes')
+        else:
+            print(form.errors)
+
     else:
         form = IncidenteForm()
 
@@ -38,10 +43,11 @@ def editar_incidente(request, id):
 
 def eliminar_incidente(request, id):
     incidente = get_object_or_404(Incidente, id=id)
-    incidente.delete()
-    return redirect('lista_incidentes')   
+    if request.method == 'POST':
+        incidente.delete()
+        return redirect('lista_incidentes')   
+    return render(request, 'confirmar_eliminar.html', {'incidente': incidente})
 
-from django.contrib.auth import authenticate, login
 
 def login_view(request):
     if request.method == 'POST':
@@ -52,8 +58,44 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect('lista_incidentes')
+            return redirect('dashboard')
         else:
             return render(request, 'login.html', {'error': 'Usuario o contraseña incorrectos'})
 
     return render(request, 'login.html')
+
+def dashboard(request):
+    
+    criticos = Incidente.objects.filter(
+    riesgo='critico'
+).count()
+
+    total = Incidente.objects.count()
+
+    pendientes = Incidente.objects.filter(
+        estado='pendiente'
+    ).count()
+
+    en_proceso = Incidente.objects.filter(
+        estado='en_proceso'
+    ).count()
+
+    resueltos = Incidente.objects.filter(
+        estado='resuelto'
+    ).count()
+
+    incidentes_recientes = Incidente.objects.order_by('-fecha')[:5]
+
+    contexto = {
+        'total': total,
+        'pendientes': pendientes,
+        'en_proceso': en_proceso,
+        'resueltos': resueltos,
+        'incidentes_recientes': incidentes_recientes,
+    }
+
+    return render(
+        request,
+        'dashboard.html',
+        contexto
+    )
