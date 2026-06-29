@@ -1,180 +1,107 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard - SomaSafe</title>
+{% extends 'base.html' %}
 
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet" />
+{% block title %}Dashboard - SomaSafe{% endblock %}
+{% block eyebrow %}Centro de control{% endblock %}
+{% block page_title %}Dashboard operativo{% endblock %}
+{% block page_subtitle %}Indicadores clave para seguimiento de incidentes de seguridad minera.{% endblock %}
 
-    <style>
-      body {
-        background-color: #f4f6f8;
-      }
+{% block actions %}
+<a href="{% url 'registrar_incidente' %}" class="btn btn-primary">Nuevo incidente</a>
+{% endblock %}
 
-      .header {
-        background-color: #0f3d56;
-        color: white;
-        padding: 20px;
-      }
+{% block content %}
+<section class="kpi-grid" aria-label="Indicadores principales">
+  <article class="kpi-card" style="--kpi-color: #0e7c7b">
+    <span class="kpi-label">Total incidentes</span>
+    <strong class="kpi-value">{{ total }}</strong>
+    <span class="kpi-note">Registros acumulados</span>
+  </article>
 
-      .card-dashboard {
-        border: none;
-        border-radius: 15px;
-      }
+  <article class="kpi-card" style="--kpi-color: #f59e0b">
+    <span class="kpi-label">Pendientes</span>
+    <strong class="kpi-value">{{ pendientes }}</strong>
+    <span class="kpi-note">Requieren revisión</span>
+  </article>
 
-      .card {
-        border: none;
-        border-radius: 18px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        transition: all 0.3s;
-      }
+  <article class="kpi-card" style="--kpi-color: #2563eb">
+    <span class="kpi-label">En proceso</span>
+    <strong class="kpi-value">{{ en_proceso }}</strong>
+    <span class="kpi-note">Con seguimiento activo</span>
+  </article>
 
-      .card:hover {
-        transform: translateY(-4px);
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand fw-bold fs-3" href="/dashboard/">
-          🛡️ SomaSafe
-        </a>
+  <article class="kpi-card" style="--kpi-color: #16a34a">
+    <span class="kpi-label">Resueltos</span>
+    <strong class="kpi-value">{{ resueltos }}</strong>
+    <span class="kpi-note">Cerrados operativamente</span>
+  </article>
 
-        <div>
-          <a href="/dashboard/" class="btn btn-outline-light me-2">
-            Dashboard
-          </a>
+  <article class="kpi-card" style="--kpi-color: #dc2626">
+    <span class="kpi-label">Críticos</span>
+    <strong class="kpi-value">{{ criticos }}</strong>
+    <span class="kpi-note">Prioridad máxima</span>
+  </article>
+</section>
 
-          <a href="/registrar/" class="btn btn-outline-light me-2">
-            Registrar
-          </a>
-
-          <a href="/incidentes/" class="btn btn-outline-light"> Incidentes </a>
-        </div>
-      </div>
-    </nav>
-    <div class="header">
-      <h1>SomaSafe Dashboard</h1>
-
-      <p>Gestión de incidentes de seguridad minera</p>
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2>Incidentes recientes</h2>
+      <p>Últimos reportes ingresados al sistema.</p>
     </div>
+    <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-primary">Ver todos</a>
+  </div>
 
-    <div class="container-fluid px-5 mt-4">
-      <div class="row">
-        <div class="col-md-3">
-          <div class="card shadow border-primary">
-            <div class="card-body text-center">
-              <h6 class="text-muted">Total Incidentes</h6>
-              <h1>{{ total }}</h1>
-            </div>
-          </div>
-        </div>
+  <div class="table-responsive">
+    <table class="table align-middle">
+      <thead>
+        <tr>
+          <th>Tipo</th>
+          <th>Fecha</th>
+          <th>Ubicación</th>
+          <th>Estado</th>
+          <th>Riesgo</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for incidente in incidentes_recientes %}
+        <tr>
+          <td>{{ incidente.get_tipo_display }}</td>
+          <td>{{ incidente.fecha }}</td>
+          <td>{{ incidente.ubicacion }}</td>
+          <td>
+            <span class="badge-status estado-{{ incidente.estado }}">
+              {{ incidente.get_estado_display }}
+            </span>
+          </td>
+          <td>
+            <span class="badge-status riesgo-{{ incidente.riesgo }}">
+              {{ incidente.get_riesgo_display }}
+            </span>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">
+            <div class="empty-state">No hay incidentes recientes.</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
 
-        <div class="col-md-3">
-          <div class="card shadow border-danger">
-            <div class="card-body text-center">
-              <h6 class="text-muted">Pendientes</h6>
-              <h1>{{ pendientes }}</h1>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card shadow border-warning">
-            <div class="card-body text-center">
-              <h6 class="text-muted">En proceso</h6>
-              <h1>{{ en_proceso }}</h1>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-3">
-          <div class="card shadow border-success">
-            <div class="card-body text-center">
-              <h6 class="text-muted">Resueltos</h6>
-              <h1>{{ resueltos }}</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="row mt-3">
-        <div class="col-md-3">
-          <div class="card shadow border-danger">
-            <div class="card-body text-center">
-              <h6 class="text-muted">Incidentes Críticos</h6>
-
-              <h1>{{ criticos }}</h1>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card shadow mt-4">
-        <div class="card-body">
-          <h5>Filtros</h5>
-
-          <div class="row">
-            <div class="col-md-4">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Buscar incidentes" />
-            </div>
-
-            <div class="col-md-4">
-              <select class="form-select">
-                <option>Todos los estados</option>
-              </select>
-            </div>
-
-            <div class="col-md-4">
-              <select class="form-select">
-                <option>Todas las prioridades</option>
-              </select>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="mt-4">
-        <a href="/registrar/" class="btn btn-dark"> + Nuevo Incidente </a>
-        <a href="/registrar/" class="btn btn-success"> Registrar incidente </a>
-
-        <a href="/incidentes/" class="btn btn-primary"> Ver incidentes </a>
-      </div>
-      <div class="card shadow mt-4">
-        <div class="card-body">
-          <h4>Incidentes recientes</h4>
-
-          <table class="table table-striped">
-            <thead>
-              <tr>
-                <th>Tipo</th>
-                <th>Fecha</th>
-                <th>Ubicación</th>
-                <th>Estado</th>
-                <th>Riesgo</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {% for incidente in incidentes_recientes %}
-
-              <tr>
-                <td>{{ incidente.tipo }}</td>
-                <td>{{ incidente.fecha }}</td>
-                <td>{{ incidente.ubicacion }}</td>
-                <td>{{ incidente.estado }}</td>
-                <td>{{ incidente.riesgo }}</td>
-              </tr>
-
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-      </div>
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2>Acciones rápidas</h2>
+      <p>Accesos para operaciones frecuentes del equipo de seguridad.</p>
     </div>
-  </body>
-</html>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <a href="{% url 'registrar_incidente' %}" class="btn btn-primary">Registrar incidente</a>
+    <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-primary">Gestionar incidentes</a>
+    <a href="{% url 'admin:index' %}" class="btn btn-outline-secondary">Administración</a>
+  </div>
+</section>
+{% endblock %}
