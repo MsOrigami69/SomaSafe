@@ -1,106 +1,133 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Registrar Incidente</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet" />
-    <style>
-      body {
-        background-color: #f4f6f8;
-      }
+{% extends 'base.html' %}
 
-      .header {
-        background-color: #0f3d56;
-        color: white;
-        padding: 25px;
-        text-align: center;
-      }
+{% block title %}Registrar incidente - SomaSafe{% endblock %}
+{% block eyebrow %}Reporte de seguridad{% endblock %}
+{% block page_title %}Registrar incidente{% endblock %}
+{% block page_subtitle %}Completa la información necesaria para activar el seguimiento operativo.{% endblock %}
 
-      .card-custom {
-        border: none;
-        border-radius: 12px;
-      }
-    </style>
-  </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="/dashboard/"> SomaSafe </a>
+{% block actions %}
+<a href="{% url 'lista_incidentes' %}" class="btn btn-outline-primary">Ver incidentes</a>
+{% endblock %}
 
-        <div>
-          <a href="/dashboard/" class="btn btn-outline-light me-2">
-            Dashboard
-          </a>
-
-          <a href="/registrar/" class="btn btn-outline-light me-2">
-            Registrar
-          </a>
-
-          <a href="/incidentes/" class="btn btn-outline-light"> Incidentes </a>
-        </div>
-      </div>
-    </nav>
-    <div class="header">
-      <h1 class="mb-0">Registrar Incidente</h1>
-      <p class="mb-0">
-        Sistema SomaSafe - Gestión de incidentes de seguridad minera
-      </p>
+{% block content %}
+<section class="panel form-panel">
+  <div class="panel-header">
+    <div>
+      <h2>Datos del incidente</h2>
+      <p>Registra ubicación, clasificación, estado y nivel de riesgo.</p>
     </div>
+  </div>
 
-    <div class="container mt-5 mb-5">
-      <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
-          <div class="card shadow card-custom">
-            <div class="card-body p-4">
-              <form method="post">
-                {% csrf_token %}
+  <form method="post">
+    {% csrf_token %}
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.tipo.label }}</label>
-                  {{ form.tipo }}
-                </div>
+    {% if form.non_field_errors %}
+    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+    {% endif %}
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.fecha.label }}</label>
-                  {{ form.fecha }}
-                </div>
+    <div class="form-grid">
+      <div>
+        <label class="form-label">{{ form.tipo.label }}</label>
+        {{ form.tipo }}
+        {% for error in form.tipo.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.descripcion.label }}</label>
-                  {{ form.descripcion }}
-                </div>
+      <div>
+        <label class="form-label">{{ form.fecha.label }}</label>
+        {{ form.fecha }}
+        {% for error in form.fecha.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.ubicacion.label }}</label>
-                  {{ form.ubicacion }}
-                </div>
+      <div class="full">
+        <label class="form-label">{{ form.descripcion.label }}</label>
+        {{ form.descripcion }}
+        {% for error in form.descripcion.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-                <div class="mb-4">
-                  <label class="form-label">{{ form.estado.label }}</label>
-                  {{ form.estado }}
-                </div>
+      <div class="full">
+        <label class="form-label">{{ form.ubicacion.label }}</label>
+        {{ form.ubicacion }}
+        {% for error in form.ubicacion.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-                <div class="mb-3">
-                  <label class="form-label">{{ form.riesgo.label }}</label>
-                  {{ form.riesgo }}
-                </div>
+      <div>
+        <label class="form-label">{{ form.estado.label }}</label>
+        {{ form.estado }}
+        {% for error in form.estado.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
 
-                <div class="d-flex gap-2 flex-wrap">
-                  <button type="submit" class="btn btn-success">
-                    Guardar incidente
-                  </button>
-                  <a href="/" class="btn btn-secondary">Volver al inicio</a>
-                  <a href="/incidentes/" class="btn btn-primary"
-                    >Ver lista de incidentes</a
-                  >
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
+      <div>
+        <label class="form-label">{{ form.riesgo.label }}</label>
+        {{ form.riesgo }}
+        {% for error in form.riesgo.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label class="form-label">{{ form.responsable.label }}</label>
+        {{ form.responsable }}
+        {% for error in form.responsable.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div>
+        <label class="form-label">{{ form.fecha_resolucion.label }}</label>
+        {{ form.fecha_resolucion }}
+        {% for error in form.fecha_resolucion.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="full">
+        <label class="form-label">{{ form.acciones_correctivas.label }}</label>
+        {{ form.acciones_correctivas }}
+        {% for error in form.acciones_correctivas.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
       </div>
     </div>
-  </body>
-</html>
+
+    <div class="d-flex gap-2 flex-wrap mt-4">
+      <button type="submit" class="btn btn-primary">Guardar incidente</button>
+      <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-secondary">Cancelar</a>
+    </div>
+  </form>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const estadoSelect = document.getElementById('id_estado');
+    const fechaResolucionInput = document.getElementById('id_fecha_resolucion');
+
+    if (estadoSelect && fechaResolucionInput) {
+      function toggleFechaResolucion() {
+        if (estadoSelect.value === 'resuelto') {
+          fechaResolucionInput.setAttribute('required', 'required');
+          if (!fechaResolucionInput.value) {
+            const today = new Date().toISOString().split('T')[0];
+            fechaResolucionInput.value = today;
+          }
+        } else {
+          fechaResolucionInput.removeAttribute('required');
+        }
+      }
+
+      estadoSelect.addEventListener('change', toggleFechaResolucion);
+      // Ejecutar al cargar la página por si se edita un incidente ya resuelto
+      toggleFechaResolucion();
+    }
+  });
+</script>
+{% endblock %}

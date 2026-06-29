@@ -1,119 +1,68 @@
-<!doctype html>
-<html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Lista de incidentes</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet" />
+{% extends 'base.html' %}
 
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f6f8;
-        margin: 0;
-        padding: 20px;
-      }
+{% block title %}Incidentes - SomaSafe{% endblock %}
+{% block eyebrow %}Gestión de incidentes{% endblock %}
+{% block page_title %}Incidentes registrados{% endblock %}
+{% block page_subtitle %}Monitoreo y seguimiento operativo de reportes de seguridad minera.{% endblock %}
 
-      h1 {
-        text-align: center;
-        color: #0f3d56;
-        margin-top: 30px;
-      }
+{% block actions %}
+<a href="{% url 'registrar_incidente' %}" class="btn btn-primary">Nuevo incidente</a>
+{% endblock %}
 
-      table {
-        width: 95%;
-        margin: 20px auto;
-        border-collapse: collapse;
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      }
+{% block content %}
+<section class="panel">
+  <div class="panel-header">
+    <div>
+      <h2>Listado general</h2>
+      <p>Consulta estado, riesgo y acciones disponibles para cada reporte.</p>
+    </div>
+  </div>
 
-      th {
-        background-color: #2c3e50;
-        color: white;
-        padding: 10px;
-      }
-
-      td {
-        padding: 10px;
-        text-align: center;
-        border-bottom: 1px solid #ddd;
-      }
-
-      tr:hover {
-        background-color: #f1f1f1;
-      }
-
-      a {
-        text-decoration: none;
-        padding: 5px 10px;
-        border-radius: 5px;
-        font-size: 14px;
-      }
-
-      a[href*="editar"] {
-        background-color: #3498db;
-        color: white;
-      }
-
-      a[href*="eliminar"] {
-        background-color: #e74c3c;
-        color: white;
-      }
-
-      .volver {
-        display: block;
-        text-align: center;
-        margin-top: 20px;
-        color: #2c3e50;
-      }
-      .estado-pendiente {
-        color: #dc3545;
-        font-weight: bold;
-      }
-
-      .estado-proceso {
-        color: #fd7e14;
-        font-weight: bold;
-      }
-
-      .estado-resuelto {
-        color: #198754;
-        font-weight: bold;
-      }
-    </style>
-  </head>
-
-  <body>
-    <nav
-      class="navbar navbar-expand-lg navbar-dark"
-      style="background: #0f3d56">
-      <div class="container">
-        <a class="navbar-brand" href="/dashboard/"> SomaSafe </a>
-
-        <div>
-          <a href="/dashboard/" class="btn btn-outline-light me-2">
-            Dashboard
-          </a>
-
-          <a href="/registrar/" class="btn btn-outline-light me-2">
-            Registrar
-          </a>
-
-          <a href="/incidentes/" class="btn btn-outline-light"> Incidentes </a>
-        </div>
+  <!-- Barra de Filtros y Búsqueda -->
+  <div class="filter-bar mb-4">
+    <form method="GET" class="row g-3 align-items-end">
+      <div class="col-md-4">
+        <label for="search-input" class="form-label">Buscar</label>
+        <input
+          type="text"
+          name="q"
+          id="search-input"
+          class="form-control"
+          placeholder="Descripción, ubicación o tipo..."
+          value="{{ busqueda }}" />
       </div>
-    </nav>
-    <h1>Lista de Incidentes</h1>
-    <p style="text-align: center; color: #6c757d">
-      Monitoreo y seguimiento de incidentes de seguridad minera
-    </p>
+      <div class="col-md-3">
+        <label for="estado-select" class="form-label">Estado</label>
+        <select name="estado" id="estado-select" class="form-select">
+          <option value="">Todos los estados</option>
+          {% for valor, etiqueta in estados %}
+          <option value="{{ valor }}" {% if estado_actual == valor %}selected{% endif %}>
+            {{ etiqueta }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3">
+        <label for="riesgo-select" class="form-label">Nivel de riesgo</label>
+        <select name="riesgo" id="riesgo-select" class="form-select">
+          <option value="">Todos los riesgos</option>
+          {% for valor, etiqueta in riesgos %}
+          <option value="{{ valor }}" {% if riesgo_actual == valor %}selected{% endif %}>
+            {{ etiqueta }}
+          </option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-2 d-flex gap-2">
+        <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+        <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-secondary w-100">Limpiar</a>
+      </div>
+    </form>
+  </div>
 
-    {% if incidentes %}
-    <table>
+  {% if incidentes %}
+  <div class="table-responsive">
+    <table class="table align-middle">
       <thead>
         <tr>
           <th>ID</th>
@@ -125,51 +74,88 @@
           <th>Acciones</th>
         </tr>
       </thead>
-
       <tbody>
         {% for incidente in incidentes %}
         <tr>
-          <td>{{ incidente.id }}</td>
-          <td>{{ incidente.tipo }}</td>
+          <td><span class="incident-id">#{{ incidente.id }}</span></td>
+          <td>{{ incidente.get_tipo_display }}</td>
           <td>{{ incidente.fecha }}</td>
           <td>{{ incidente.ubicacion }}</td>
           <td>
-            {% if incidente.estado == 'pendiente' %}
-            <span style="color: red; font-weight: bold"> Pendiente </span>
-
-            {% elif incidente.estado == 'en_proceso' %}
-            <span style="color: orange; font-weight: bold"> En proceso </span>
-
-            {% else %}
-            <span style="color: green; font-weight: bold"> Resuelto </span>
-            {% endif %}
+            <span class="badge-status estado-{{ incidente.estado }}">
+              {{ incidente.get_estado_display }}
+            </span>
           </td>
           <td>
-            {% if incidente.riesgo == 'bajo' %}
-            <span style="color: green; font-weight: bold"> Bajo </span>
-
-            {% elif incidente.riesgo == 'medio' %}
-            <span style="color: goldenrod; font-weight: bold"> Medio </span>
-
-            {% elif incidente.riesgo == 'alto' %}
-            <span style="color: orange; font-weight: bold"> Alto </span>
-
-            {% else %}
-            <span style="color: red; font-weight: bold"> Crítico </span>
-            {% endif %}
+            <span class="badge-status riesgo-{{ incidente.riesgo }}">
+              {{ incidente.get_riesgo_display }}
+            </span>
           </td>
           <td>
-            <a href="/editar/{{ incidente.id }}/">Editar</a>
-            <a href="/eliminar/{{ incidente.id }}/">Eliminar</a>
+            <span class="action-row">
+              <a class="btn-table edit" href="{% url 'editar_incidente' incidente.id %}">Editar</a>
+              <a class="btn-table delete" href="{% url 'eliminar_incidente' incidente.id %}">Eliminar</a>
+            </span>
           </td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    {% else %}
-    <p style="text-align: center">No hay incidentes registrados.</p>
-    {% endif %}
+  </div>
 
-    <a href="/" class="volver">Volver al Inicio</a>
-  </body>
-</html>
+  <!-- Controles de Paginación -->
+  {% if page_obj.has_other_pages %}
+  <nav class="pagination-nav mt-4" aria-label="Paginación de incidentes">
+    <ul class="pagination justify-content-center">
+      {% if page_obj.has_previous %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page=1{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if riesgo_actual %}&riesgo={{ riesgo_actual }}{% endif %}"
+          aria-label="Primera"
+          >&laquo; Primera</a
+        >
+      </li>
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ page_obj.previous_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if riesgo_actual %}&riesgo={{ riesgo_actual }}{% endif %}"
+          aria-label="Anterior"
+          >Anterior</a
+        >
+      </li>
+      {% endif %}
+
+      <li class="page-item active" aria-current="page">
+        <span class="page-link">
+          Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+        </span>
+      </li>
+
+      {% if page_obj.has_next %}
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ page_obj.next_page_number }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if riesgo_actual %}&riesgo={{ riesgo_actual }}{% endif %}"
+          aria-label="Siguiente"
+          >Siguiente</a
+        >
+      </li>
+      <li class="page-item">
+        <a
+          class="page-link"
+          href="?page={{ page_obj.paginator.num_pages }}{% if busqueda %}&q={{ busqueda }}{% endif %}{% if estado_actual %}&estado={{ estado_actual }}{% endif %}{% if riesgo_actual %}&riesgo={{ riesgo_actual }}{% endif %}"
+          aria-label="Última"
+          >Última &raquo;</a
+        >
+      </li>
+      {% endif %}
+    </ul>
+  </nav>
+  {% endif %}
+
+  {% else %}
+  <div class="empty-state">No hay incidentes registrados que coincidan con la búsqueda.</div>
+  {% endif %}
+</section>
+{% endblock %}

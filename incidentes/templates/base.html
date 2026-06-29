@@ -1,0 +1,97 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}SomaSafe{% endblock %}</title>
+    <link rel="icon" href="{% static 'img/favicon2.png' %}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet" />
+    <link href="{% static 'css/somasafe.css' %}" rel="stylesheet" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <a class="brand" href="{% url 'dashboard' %}" aria-label="SomaSafe Dashboard">
+          <span class="brand-mark">S</span>
+          <span>
+            <strong>SomaSafe</strong>
+            <small>Seguridad minera</small>
+          </span>
+        </a>
+
+        <nav class="nav-menu" aria-label="Navegación principal">
+          <a
+            href="{% url 'dashboard' %}"
+            class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <span class="nav-icon">⌂</span>
+            Dashboard
+          </a>
+          <a
+            href="{% url 'lista_incidentes' %}"
+            class="{% if request.resolver_match.url_name == 'lista_incidentes' %}active{% endif %}">
+            <span class="nav-icon">▤</span>
+            Incidentes
+          </a>
+          <a
+            href="{% url 'registrar_incidente' %}"
+            class="{% if request.resolver_match.url_name == 'registrar_incidente' or request.resolver_match.url_name == 'editar_incidente' %}active{% endif %}">
+            <span class="nav-icon">＋</span>
+            Registrar
+          </a>
+          <a href="{% url 'admin:index' %}">
+            <span class="nav-icon">⚙</span>
+            Administración
+          </a>
+        </nav>
+
+        <div class="sidebar-status">
+          <span class="status-dot"></span>
+          <div>
+            <strong>Operación activa</strong>
+            <small>Monitoreo de seguridad</small>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">{% block eyebrow %}SomaSafe{% endblock %}</p>
+            <h1>{% block page_title %}Panel operativo{% endblock %}</h1>
+            <p>{% block page_subtitle %}Gestión y seguimiento de incidentes de seguridad minera.{% endblock %}</p>
+          </div>
+
+          <div class="topbar-actions">
+            {% if user.is_authenticated %}
+            <span class="user-pill">{{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm me-2" aria-label="Cerrar sesión">Cerrar sesión</a>
+            {% endif %}
+            {% block actions %}{% endblock %}
+          </div>
+        </header>
+
+        {% if messages %}
+        <div class="messages-container mb-4">
+          {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
