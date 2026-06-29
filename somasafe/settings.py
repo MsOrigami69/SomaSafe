@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -19,13 +20,25 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-^3u-%vxfy6do=9ty32lbz)4(1#1w%k7_u%n!ny91(go@r3456_'
+def env_bool(name, default=False):
+    return os.environ.get(name, str(default)).lower() in {'1', 'true', 'yes', 'on'}
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get(
+    'DJANGO_SECRET_KEY',
+    'somasafe-local-development-secret-key-change-before-production-2026',
+)
+
+DEBUG = env_bool('DJANGO_DEBUG', True)
+
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        'DJANGO_ALLOWED_HOSTS',
+        'localhost,127.0.0.1,[::1],testserver',
+    ).split(',')
+    if host.strip()
+]
 
 
 # Application definition
@@ -103,9 +116,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'es-pe'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Lima'
 
 USE_I18N = True
 
@@ -120,3 +133,14 @@ STATIC_URL = 'static/'
 STATICFILES_DIRS = [
     BASE_DIR / "incidentes/static",
 ]
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'dashboard'
+LOGOUT_REDIRECT_URL = 'login'
+
+SECURE_SSL_REDIRECT = False if DEBUG else env_bool('DJANGO_SECURE_SSL_REDIRECT', True)
+SESSION_COOKIE_SECURE = False if DEBUG else env_bool('DJANGO_SESSION_COOKIE_SECURE', True)
+CSRF_COOKIE_SECURE = False if DEBUG else env_bool('DJANGO_CSRF_COOKIE_SECURE', True)
+SECURE_HSTS_SECONDS = 0 if DEBUG else int(os.environ.get('DJANGO_SECURE_HSTS_SECONDS', 31536000))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False if DEBUG else env_bool('DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS', True)
+SECURE_HSTS_PRELOAD = False if DEBUG else env_bool('DJANGO_SECURE_HSTS_PRELOAD', True)
