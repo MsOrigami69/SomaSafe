@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Registrar incidente - SomaSafe{% endblock %}
+{% block title %}
+  {% if modo == 'crear' %}Registrar incidente{% else %}Editar incidente #{{ incidente.id }}{% endif %} - SomaSafe
+{% endblock %}
+
 {% block eyebrow %}Reporte de seguridad{% endblock %}
-{% block page_title %}Registrar incidente{% endblock %}
+{% block page_title %}
+  {% if modo == 'crear' %}Registrar incidente{% else %}Editar incidente #{{ incidente.id }}{% endif %}
+{% endblock %}
 {% block page_subtitle %}Completa la información necesaria para activar el seguimiento operativo.{% endblock %}
 
 {% block actions %}
@@ -14,11 +19,11 @@
   <div class="panel-header">
     <div>
       <h2>Datos del incidente</h2>
-      <p>Registra ubicación, clasificación, estado y nivel de riesgo.</p>
+      <p>Registra ubicación, clasificación, estado, nivel de riesgo y evidencias.</p>
     </div>
   </div>
 
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     {% if form.non_field_errors %}
@@ -97,14 +102,69 @@
         <div class="text-danger small mt-1">{{ error }}</div>
         {% endfor %}
       </div>
+
+      <!-- Campo de Evidencia Fotográfica -->
+      <div class="full">
+        <label class="form-label">{{ form.evidencia.label }}</label>
+        {{ form.evidencia }}
+        {% for error in form.evidencia.errors %}
+        <div class="text-danger small mt-1">{{ error }}</div>
+        {% endfor %}
+        
+        {% if incidente.evidencia %}
+        <div class="mt-3">
+          <p class="small text-muted mb-2">Evidencia registrada actualmente:</p>
+          <div class="evidence-preview-wrapper" style="border: 1px solid var(--color-border); border-radius: 8px; padding: 10px; display: inline-block; background: var(--color-surface-muted);">
+            <img src="{{ incidente.evidencia.url }}" alt="Evidencia del incidente" style="max-width: 100%; max-height: 250px; border-radius: 6px; display: block;">
+          </div>
+        </div>
+        {% endif %}
+      </div>
     </div>
 
     <div class="d-flex gap-2 flex-wrap mt-4">
       <button type="submit" class="btn btn-primary">Guardar incidente</button>
       <a href="{% url 'lista_incidentes' %}" class="btn btn-outline-secondary">Cancelar</a>
+      
+      {% if modo == 'editar' %}
+      <button type="button" class="btn btn-outline-dark ms-auto" onclick="window.print()">Imprimir Ficha PDF</button>
+      {% endif %}
     </div>
   </form>
 </section>
+
+{% if modo == 'editar' %}
+<!-- Panel de Historial de Auditoría -->
+<section class="panel mt-4 print-hide">
+  <div class="panel-header">
+    <div>
+      <h2>Historial de Auditoría de Cambios</h2>
+      <p>Trazabilidad histórica de modificaciones realizadas a este incidente.</p>
+    </div>
+  </div>
+
+  <div class="timeline mt-3" style="display: flex; flex-direction: column; gap: 16px;">
+    {% for log in historial %}
+    <div class="timeline-item pb-3 mb-1 border-bottom">
+      <div class="d-flex justify-content-between align-items-center mb-1">
+        <strong>{{ log.usuario.username }}</strong>
+        <span class="small text-muted">{{ log.fecha_cambio|date:"d/m/Y H:i:s" }}</span>
+      </div>
+      <p class="mb-1 text-secondary" style="font-size: 14px;">
+        Modificó el campo <strong>{{ log.campo_modificado }}</strong>: 
+        anteriormente era <span class="text-danger"><del>{{ log.valor_anterior }}</del></span> y cambió a 
+        <span class="text-success"><strong>{{ log.valor_nuevo }}</strong></span>.
+      </p>
+      {% if log.detalle %}
+      <small class="text-muted italic">{{ log.detalle }}</small>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="text-center text-muted py-3">No hay registros de modificaciones para este incidente.</div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
 
 <script>
   document.addEventListener('DOMContentLoaded', function() {

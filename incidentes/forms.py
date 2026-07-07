@@ -18,6 +18,7 @@ class IncidenteForm(forms.ModelForm):
             'responsable',
             'acciones_correctivas',
             'fecha_resolucion',
+            'evidencia',
         ]
         widgets = {
             'tipo': forms.Select(attrs={'class': 'form-select'}),
@@ -29,11 +30,13 @@ class IncidenteForm(forms.ModelForm):
             'responsable': forms.Select(attrs={'class': 'form-select'}),
             'acciones_correctivas': forms.Textarea(attrs={'class': 'form-control', 'rows': 4}),
             'fecha_resolucion': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'evidencia': forms.ClearableFileInput(attrs={'class': 'form-control'}),
         }
         labels = {
             'riesgo': 'Nivel de riesgo',
             'fecha_resolucion': 'Fecha de resolucion',
             'acciones_correctivas': 'Acciones correctivas',
+            'evidencia': 'Evidencia fotográfica',
         }
 
     def clean_fecha(self):
