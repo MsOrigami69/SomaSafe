@@ -191,7 +191,27 @@ def dashboard(request):
     por_riesgo = incidentes.values('riesgo').annotate(total=Count('id'))
     datos_riesgo = {item['riesgo']: item['total'] for item in por_riesgo}
 
-    # 3. Actividad reciente: últimos 8 cambios registrados en la bitácora
+    # 3. Tendencia mensual (últimos 6 meses)
+    import collections
+    datos_tendencia = collections.defaultdict(int)
+    for inc in incidentes:
+        if inc.fecha:
+            mes_key = inc.fecha.strftime('%Y-%m')
+            datos_tendencia[mes_key] += 1
+
+    meses_ordenados = sorted(datos_tendencia.keys())
+    nombres_meses = {
+        '01': 'Ene', '02': 'Feb', '03': 'Mar', '04': 'Abr', '05': 'May', '06': 'Jun',
+        '07': 'Jul', '08': 'Ago', '09': 'Set', '10': 'Oct', '11': 'Nov', '12': 'Dic'
+    }
+
+    grafico_tendencia_datos = {}
+    for mes in meses_ordenados[-6:]:
+        ano, mes_num = mes.split('-')
+        label = f"{nombres_meses[mes_num]} {ano}"
+        grafico_tendencia_datos[label] = datos_tendencia[mes]
+
+    # 4. Actividad reciente: últimos 8 cambios registrados en la bitácora
     actividades_recientes = (
         HistorialIncidente.objects
         .select_related('usuario', 'incidente')
@@ -207,6 +227,7 @@ def dashboard(request):
         'actividades_recientes': actividades_recientes,
         'grafico_tipo_json': json.dumps(datos_tipo),
         'grafico_riesgo_json': json.dumps(datos_riesgo),
+        'grafico_tendencia_json': json.dumps(grafico_tendencia_datos),
     }
 
     return render(request, 'dashboard.html', contexto)

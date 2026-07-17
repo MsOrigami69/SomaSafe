@@ -6,16 +6,17 @@
 {% block page_subtitle %}Monitoreo y seguimiento operativo de reportes de seguridad minera.{% endblock %}
 
 {% block actions %}
-<a href="{% url 'registrar_incidente' %}" class="btn btn-primary">Nuevo incidente</a>
-<a href="{% url 'exportar_incidentes_csv' %}?q={{ busqueda }}&estado={{ estado_actual }}&riesgo={{ riesgo_actual }}" class="btn btn-outline-success">Exportar Excel (CSV)</a>
+<a href="{% url 'exportar_incidentes_csv' %}?q={{ busqueda }}&estado={{ estado_actual }}&riesgo={{ riesgo_actual }}" class="btn btn-outline-success">
+  <i class="bi bi-file-earmark-excel"></i> Exportar Excel (CSV)
+</a>
 {% endblock %}
 
 {% block content %}
 <section class="panel">
   <div class="panel-header">
     <div>
-      <h2>Listado general</h2>
-      <p>Consulta estado, riesgo y acciones disponibles para cada reporte.</p>
+      <h2>Listado general de reportes</h2>
+      <p>Consulte criticidad, responsables asignados y trazabilidad de eventos.</p>
     </div>
   </div>
 
@@ -72,6 +73,7 @@
           <th>Ubicación</th>
           <th>Estado</th>
           <th>Riesgo</th>
+          <th>Prioridad</th>
           <th>Acciones</th>
         </tr>
       </thead>
@@ -79,8 +81,17 @@
         {% for incidente in incidentes %}
         <tr>
           <td><span class="incident-id">#{{ incidente.id }}</span></td>
-          <td>{{ incidente.get_tipo_display }}</td>
-          <td>{{ incidente.fecha }}</td>
+          <td>
+            {% if incidente.tipo == 'accidente' %}
+              <i class="bi bi-exclamation-triangle-fill text-danger me-1"></i>
+            {% elif incidente.tipo == 'casi_accidente' %}
+              <i class="bi bi-exclamation-circle-fill text-warning me-1"></i>
+            {% else %}
+              <i class="bi bi-info-circle-fill text-info me-1"></i>
+            {% endif %}
+            {{ incidente.get_tipo_display }}
+          </td>
+          <td>{{ incidente.fecha|date:"d/m/Y" }}</td>
           <td>{{ incidente.ubicacion }}</td>
           <td>
             <span class="badge-status estado-{{ incidente.estado }}">
@@ -93,9 +104,18 @@
             </span>
           </td>
           <td>
+            <span class="badge-status prioridad-{{ incidente.prioridad }}">
+              {{ incidente.get_prioridad_display }}
+            </span>
+          </td>
+          <td>
             <span class="action-row">
-              <a class="btn-table edit" href="{% url 'editar_incidente' incidente.id %}">Editar</a>
-              <a class="btn-table delete" href="{% url 'eliminar_incidente' incidente.id %}">Eliminar</a>
+              <a class="btn-table edit" href="{% url 'editar_incidente' incidente.id %}" title="Inspeccionar / Editar">
+                <i class="bi bi-pencil-square"></i> Editar
+              </a>
+              <a class="btn-table delete" href="{% url 'eliminar_incidente' incidente.id %}" title="Eliminar reporte">
+                <i class="bi bi-trash"></i> Eliminar
+              </a>
             </span>
           </td>
         </tr>

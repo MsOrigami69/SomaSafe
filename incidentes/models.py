@@ -37,6 +37,14 @@ class Incidente(models.Model):
     )
     acciones_correctivas = models.TextField(blank=True)
     fecha_resolucion = models.DateField(null=True, blank=True)
+    consecuencias = models.TextField(blank=True, verbose_name='Consecuencias del incidente')
+    observaciones = models.TextField(blank=True, verbose_name='Observaciones adicionales')
+    prioridad = models.CharField(
+        max_length=15,
+        choices=[('baja', 'Baja'), ('media', 'Media'), ('alta', 'Alta'), ('urgente', 'Urgente')],
+        default='baja',
+        verbose_name='Prioridad'
+    )
     evidencia = models.ImageField(
         upload_to='incidentes/evidencias/',
         blank=True,

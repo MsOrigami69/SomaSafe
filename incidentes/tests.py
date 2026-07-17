@@ -41,6 +41,7 @@ class IncidenteAccessTests(TestCase):
                 'ubicacion': 'Zona norte',
                 'estado': 'pendiente',
                 'riesgo': 'medio',
+                'prioridad': 'baja',
             },
         )
 
@@ -101,6 +102,7 @@ class IncidenteFormTests(TestCase):
             'ubicacion': 'Planta 1',
             'estado': 'pendiente',
             'riesgo': 'bajo',
+            'prioridad': 'baja',
         }
 
     def test_rejects_future_date(self):

@@ -14,6 +14,10 @@
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
       rel="stylesheet" />
+    <!-- Bootstrap Icons CDN -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <link href="{% static 'css/somasafe.css' %}" rel="stylesheet" />
   </head>
   <body>
@@ -27,37 +31,57 @@
           </span>
         </a>
 
+        <!-- Menú Lateral Reorganizado -->
         <nav class="nav-menu" aria-label="Navegación principal">
           <a
-            href="{% url 'dashboard' %}"
-            class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
-            <span class="nav-icon">⌂</span>
-            Dashboard
+            href="{% url 'registrar_incidente' %}"
+            class="{% if request.resolver_match.url_name == 'registrar_incidente' or request.resolver_match.url_name == 'editar_incidente' %}active{% endif %}">
+            <i class="bi bi-plus-circle nav-icon"></i>
+            Registrar Incidente
           </a>
           <a
             href="{% url 'lista_incidentes' %}"
             class="{% if request.resolver_match.url_name == 'lista_incidentes' %}active{% endif %}">
-            <span class="nav-icon">▤</span>
+            <i class="bi bi-card-list nav-icon"></i>
             Incidentes
           </a>
-          <a
-            href="{% url 'registrar_incidente' %}"
-            class="{% if request.resolver_match.url_name == 'registrar_incidente' or request.resolver_match.url_name == 'editar_incidente' %}active{% endif %}">
-            <span class="nav-icon">＋</span>
-            Registrar
-          </a>
           <a href="{% url 'admin:index' %}">
-            <span class="nav-icon">⚙</span>
+            <i class="bi bi-shield-lock nav-icon"></i>
             Administración
+          </a>
+          <a
+            href="{% url 'dashboard' %}"
+            class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+            <i class="bi bi-speedometer2 nav-icon"></i>
+            Dashboard
           </a>
         </nav>
 
-        <div class="sidebar-status">
-          <span class="status-dot"></span>
-          <div>
-            <strong>Operación activa</strong>
-            <small>Monitoreo de seguridad</small>
+        <div class="sidebar-footer">
+          <!-- Tarjeta de Monitoreo -->
+          <div class="sidebar-status">
+            <span class="status-dot"></span>
+            <div>
+              <strong>Control de Seguridad EHS</strong>
+              <small>Operación activa</small>
+            </div>
           </div>
+
+          <!-- Perfil de Usuario y Cerrar Sesión Reubicado -->
+          {% if user.is_authenticated %}
+          <div class="sidebar-profile">
+            <div class="profile-avatar">
+              <i class="bi bi-person-circle"></i>
+            </div>
+            <div class="profile-info">
+              <span class="profile-name" title="{{ user.username }}">{{ user.username }}</span>
+              <span class="profile-role">EHS Operator</span>
+            </div>
+            <a href="{% url 'logout' %}" class="profile-logout-btn" title="Cerrar sesión">
+              <i class="bi bi-box-arrow-right"></i>
+            </a>
+          </div>
+          {% endif %}
         </div>
       </aside>
 
@@ -69,17 +93,14 @@
             <p>{% block page_subtitle %}Gestión y seguimiento de incidentes de seguridad minera.{% endblock %}</p>
           </div>
 
+          <!-- Barra superior limpia de botones innecesarios, mantiene solo exportar excel -->
           <div class="topbar-actions">
-            {% if user.is_authenticated %}
-            <span class="user-pill">{{ user.username }}</span>
-            <a href="{% url 'logout' %}" class="btn btn-outline-danger btn-sm me-2" aria-label="Cerrar sesión">Cerrar sesión</a>
-            {% endif %}
             {% block actions %}{% endblock %}
           </div>
         </header>
 
         {% if messages %}
-        <div class="messages-container mb-4">
+        <div class="messages-container mb-4 print-hide">
           {% for message in messages %}
           <div class="alert alert-{% if message.tags == 'error' %}danger{% elif message.tags == 'success' %}success{% else %}info{% endif %} alert-dismissible fade show" role="alert">
             {{ message }}
